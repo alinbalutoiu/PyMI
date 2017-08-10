@@ -282,7 +282,7 @@ Application::Application(const std::wstring& appId)
 {
     this->m_app = MI_APPLICATION_NULL;
     MI_Instance* extError = nullptr;
-    MICheckResult(::MI_Application_Initialize(0, appId.length() ? appId.c_str() : nullptr, &extError, &this->m_app), extError);
+    MICheckResult(MI_Application_Initialize(0, appId.length() ? appId.c_str() : nullptr, &extError, &this->m_app), extError);
 }
 
 bool Application::IsClosed()
@@ -308,21 +308,21 @@ Application::~Application()
 
 void Application::Close()
 {
-    MICheckResult(::MI_Application_Close(&this->m_app));
+    MICheckResult(MI_Application_Close(&this->m_app));
     this->m_app = MI_APPLICATION_NULL;
 }
 
 std::shared_ptr<Instance> Application::NewInstanceFromClass(const std::wstring& className, const Class& miClass)
 {
     MI_Instance* instance = nullptr;
-    MICheckResult(::MI_Application_NewInstanceFromClass(&this->m_app, className.c_str(), miClass.m_class, &instance));
+    MICheckResult(MI_Application_NewInstanceFromClass(&this->m_app, className.c_str(), miClass.m_class, &instance));
     return std::make_shared<Instance>(instance, true);
 }
 
 std::shared_ptr<Instance> Application::NewInstance(const std::wstring& className)
 {
     MI_Instance* instance = nullptr;
-    MICheckResult(::MI_Application_NewInstance(&this->m_app, className.c_str(), nullptr, &instance));
+    MICheckResult(MI_Application_NewInstance(&this->m_app, className.c_str(), nullptr, &instance));
     return std::make_shared<Instance>(instance, true);
 }
 
@@ -351,28 +351,28 @@ std::shared_ptr<Instance> Application::NewMethodParamsInstance(const Class& miCl
 std::shared_ptr<Serializer> Application::NewSerializer()
 {
     MI_Serializer serializer;
-    MICheckResult(::MI_Application_NewSerializer(&this->m_app, 0, L"MI_XML", &serializer));
+    MICheckResult(MI_Application_NewSerializer(&this->m_app, 0, L"MI_XML", &serializer));
     return std::shared_ptr<Serializer>(new Serializer(serializer));
 }
 
 std::shared_ptr<OperationOptions> Application::NewOperationOptions()
 {
     MI_OperationOptions operationOptions;
-    MICheckResult(::MI_Application_NewOperationOptions(&this->m_app, MI_FALSE, &operationOptions));
+    MICheckResult(MI_Application_NewOperationOptions(&this->m_app, MI_FALSE, &operationOptions));
     return std::shared_ptr<OperationOptions>(new OperationOptions(operationOptions));
 }
 
 std::shared_ptr<DestinationOptions> Application::NewDestinationOptions()
 {
     MI_DestinationOptions destinationOptions;
-    MICheckResult(::MI_Application_NewDestinationOptions(&this->m_app, &destinationOptions));
+    MICheckResult(MI_Application_NewDestinationOptions(&this->m_app, &destinationOptions));
     return std::shared_ptr<DestinationOptions>(new DestinationOptions(destinationOptions));
 }
 
 unsigned Class::GetMethodCount() const
 {
     MI_Uint32 count = 0;
-    MICheckResult(::MI_Class_GetMethodCount(this->m_class, &count));
+    MICheckResult(MI_Class_GetMethodCount(this->m_class, &count));
     return count;
 }
 
@@ -381,12 +381,12 @@ std::map<std::wstring, std::shared_ptr<Qualifier>> GetQualifiers(MI_QualifierSet
     std::map<std::wstring, std::shared_ptr<Qualifier>> qualifiers;
 
     MI_Uint32 count = 0;
-    MICheckResult(::MI_QualifierSet_GetQualifierCount(qualifierSet, &count));
+    MICheckResult(MI_QualifierSet_GetQualifierCount(qualifierSet, &count));
     for (MI_Uint32 i = 0; i < count; i++)
     {
         const MI_Char* qualifierName = nullptr;
         auto q = std::make_shared<Qualifier>();
-        MICheckResult(::MI_QualifierSet_GetQualifierAt(qualifierSet, i, &qualifierName, &q->m_type, &q->m_flags, &q->m_value));
+        MICheckResult(MI_QualifierSet_GetQualifierAt(qualifierSet, i, &qualifierName, &q->m_type, &q->m_flags, &q->m_value));
         q->m_name = qualifierName;
         qualifiers[qualifierName] = q;
     }
@@ -399,13 +399,13 @@ std::map<std::wstring, std::shared_ptr<ParameterInfo>> GetParametersInfo(MI_Para
     std::map<std::wstring, std::shared_ptr<ParameterInfo>> parametersInfo;
 
     MI_Uint32 count = 0;
-    MICheckResult(::MI_ParameterSet_GetParameterCount(paramSet, &count));
+    MICheckResult(MI_ParameterSet_GetParameterCount(paramSet, &count));
     for (MI_Uint32 i = 0; i < count; i++)
     {
         const MI_Char* paramName = nullptr;
         auto paramInfo = std::make_shared<ParameterInfo>();
         MI_QualifierSet qualifierSet;
-        MICheckResult(::MI_ParameterSet_GetParameterAt(paramSet, i, &paramName, &paramInfo->m_type, nullptr, &qualifierSet));
+        MICheckResult(MI_ParameterSet_GetParameterAt(paramSet, i, &paramName, &paramInfo->m_type, nullptr, &qualifierSet));
         paramInfo->m_name = paramName;
         paramInfo->m_index = i;
         paramInfo->m_qualifiers = GetQualifiers(&qualifierSet);
@@ -421,7 +421,7 @@ std::shared_ptr<MethodInfo> Class::GetMethodInfo(const std::wstring& name) const
     MI_ParameterSet paramSet;
     MI_QualifierSet qualifierSet;
     MI_Uint32 index;
-    MICheckResult(::MI_Class_GetMethod(this->m_class, name.c_str(), &qualifierSet, &paramSet, &index));
+    MICheckResult(MI_Class_GetMethod(this->m_class, name.c_str(), &qualifierSet, &paramSet, &index));
     info->m_name = name;
     info->m_index = index;
     info->m_qualifiers = GetQualifiers(&qualifierSet);
@@ -435,7 +435,7 @@ std::shared_ptr<MethodInfo> Class::GetMethodInfo(unsigned index) const
     MI_ParameterSet paramSet;
     MI_QualifierSet qualifierSet;
     const MI_Char* name = nullptr;
-    MICheckResult(::MI_Class_GetMethodAt(this->m_class, index, &name, &qualifierSet, &paramSet));
+    MICheckResult(MI_Class_GetMethodAt(this->m_class, index, &name, &qualifierSet, &paramSet));
     info->m_name = name;
     info->m_index = index;
     info->m_qualifiers = GetQualifiers(&qualifierSet);
@@ -446,14 +446,14 @@ std::shared_ptr<MethodInfo> Class::GetMethodInfo(unsigned index) const
 std::wstring Class::GetClassName() const
 {
     const MI_Char* className = nullptr;
-    MICheckResult(::MI_Class_GetClassName(this->m_class, &className));
+    MICheckResult(MI_Class_GetClassName(this->m_class, &className));
     return className;
 }
 
 std::wstring Class::GetParentClassName() const
 {
     const MI_Char* parentClassName = nullptr;
-    auto result = ::MI_Class_GetParentClassName(this->m_class, &parentClassName);
+    auto result = MI_Class_GetParentClassName(this->m_class, &parentClassName);
     if (result != MI_RESULT_INVALID_SUPERCLASS)
     {
         MICheckResult(result);
@@ -464,14 +464,14 @@ std::wstring Class::GetParentClassName() const
 std::wstring Class::GetNameSpace() const
 {
     const MI_Char* nameSpace = nullptr;
-    MICheckResult(::MI_Class_GetNameSpace(this->m_class, &nameSpace));
+    MICheckResult(MI_Class_GetNameSpace(this->m_class, &nameSpace));
     return nameSpace ? nameSpace : L"";
 }
 
 std::wstring Class::GetServerName() const
 {
     const MI_Char* serverName = nullptr;
-    MICheckResult(::MI_Class_GetServerName(this->m_class, &serverName));
+    MICheckResult(MI_Class_GetServerName(this->m_class, &serverName));
     return std::wstring(serverName ? serverName : L"");
 }
 
@@ -512,7 +512,7 @@ std::shared_ptr<ClassElement> Class::operator[] (const std::wstring& name) const
 {
     auto element = std::make_shared<ClassElement>();
     MI_QualifierSet qualifierSet;
-    MICheckResult(::MI_Class_GetElement(this->m_class, name.c_str(), &element->m_value, &element->m_valueExists, &element->m_type,
+    MICheckResult(MI_Class_GetElement(this->m_class, name.c_str(), &element->m_value, &element->m_valueExists, &element->m_type,
         nullptr, &qualifierSet, &element->m_flags, &element->m_index));
     element->m_name = name;
     element->m_qualifiers = GetQualifiers(&qualifierSet);
@@ -524,7 +524,7 @@ std::shared_ptr<ClassElement> Class::operator[] (unsigned index) const
     auto element = std::make_shared<ClassElement>();
     MI_QualifierSet qualifierSet;
     const MI_Char* name;
-    MICheckResult(::MI_Class_GetElementAt(this->m_class, index, &name, &element->m_value, &element->m_valueExists, &element->m_type,
+    MICheckResult(MI_Class_GetElementAt(this->m_class, index, &name, &element->m_value, &element->m_valueExists, &element->m_type,
         nullptr, &qualifierSet, &element->m_flags));
     element->m_name = name;
     element->m_index = index;
@@ -535,14 +535,14 @@ std::shared_ptr<ClassElement> Class::operator[] (unsigned index) const
 unsigned Class::GetElementsCount() const
 {
     MI_Uint32 count = 0;
-    MICheckResult(::MI_Class_GetElementCount(this->m_class, &count));
+    MICheckResult(MI_Class_GetElementCount(this->m_class, &count));
     return count;
 }
 
 std::shared_ptr<Class> Class::GetParentClass() const
 {
     MI_Class* newClass = nullptr;
-    auto result = ::MI_Class_GetParentClass(this->m_class, &newClass);
+    auto result = MI_Class_GetParentClass(this->m_class, &newClass);
     if (result != MI_RESULT_INVALID_SUPERCLASS)
     {
         MICheckResult(result);
@@ -562,7 +562,7 @@ std::shared_ptr<Class> Class::Clone() const
     if (this->m_class)
     {
         MI_Class* newClass = nullptr;
-        MICheckResult(::MI_Class_Clone(this->m_class, &newClass));
+        MICheckResult(MI_Class_Clone(this->m_class, &newClass));
         return std::make_shared<Class>(newClass, true);
     }
     return nullptr;
@@ -577,7 +577,7 @@ bool Operation::IsClosed()
 void Operation::Close()
 {
     SetCurrentItem(nullptr);
-    MICheckResult(::MI_Operation_Close(&this->m_operation));
+    MICheckResult(MI_Operation_Close(&this->m_operation));
     this->m_operation = MI_OPERATION_NULL;
 }
 
@@ -598,7 +598,7 @@ Operation::~Operation()
 
 void Class::Delete()
 {
-    MICheckResult(::MI_Class_Delete(this->m_class));
+    MICheckResult(MI_Class_Delete(this->m_class));
     this->m_class = nullptr;
 }
 
@@ -631,33 +631,33 @@ std::shared_ptr<Session> Application::NewSession(const std::wstring& protocol, c
     MI_Instance* extError = nullptr;
     MI_Session session;
 
-    MICheckResult(::MI_Application_NewSession(&this->m_app, protocol.length() ? protocol.c_str() : nullptr, computerName.c_str(),
+    MICheckResult(MI_Application_NewSession(&this->m_app, protocol.length() ? protocol.c_str() : nullptr, computerName.c_str(),
         destinationOptions ? &destinationOptions->m_destinationOptions : nullptr, nullptr, &extError, &session), extError);
     return std::shared_ptr<Session>(new Session(session));
 }
 
 void OperationOptions::SetTimeout(const MI_Interval& timeout)
 {
-    MICheckResult(::MI_OperationOptions_SetTimeout(&this->m_operationOptions, &timeout));
+    MICheckResult(MI_OperationOptions_SetTimeout(&this->m_operationOptions, &timeout));
 }
 
 MI_Interval OperationOptions::GetTimeout()
 {
     MI_Interval timeout;
-    MICheckResult(::MI_OperationOptions_GetTimeout(&this->m_operationOptions, &timeout));
+    MICheckResult(MI_OperationOptions_GetTimeout(&this->m_operationOptions, &timeout));
     return timeout;
 }
 
 std::shared_ptr<OperationOptions> OperationOptions::Clone() const
 {
     MI_OperationOptions clonedOperationOptions;
-    MICheckResult(::MI_OperationOptions_Clone(&this->m_operationOptions, &clonedOperationOptions));
+    MICheckResult(MI_OperationOptions_Clone(&this->m_operationOptions, &clonedOperationOptions));
     return std::shared_ptr<OperationOptions>(new OperationOptions(clonedOperationOptions));
 }
 
 void OperationOptions::Delete()
 {
-    ::MI_OperationOptions_Delete(&this->m_operationOptions);
+    MI_OperationOptions_Delete(&this->m_operationOptions);
     this->m_operationOptions = MI_OPERATIONOPTIONS_NULL;
 }
 
@@ -666,7 +666,7 @@ void OperationOptions::SetCustomOption(const std::wstring& optionName,
                                        const MIValue& optionValue,
                                        MI_Boolean mustComply)
 {
-    MICheckResult(::MI_OperationOptions_SetCustomOption(
+    MICheckResult(MI_OperationOptions_SetCustomOption(
         &this->m_operationOptions, optionName.c_str(), optionValueType,
         &optionValue.m_value, mustComply));
 }
@@ -682,37 +682,37 @@ OperationOptions::~OperationOptions()
 
 void DestinationOptions::SetUILocale(const std::wstring& locale)
 {
-    MICheckResult(::MI_DestinationOptions_SetUILocale(&this->m_destinationOptions, locale.c_str()));
+    MICheckResult(MI_DestinationOptions_SetUILocale(&this->m_destinationOptions, locale.c_str()));
 }
 
 std::wstring DestinationOptions::GetUILocale()
 {
     const MI_Char* locale;
-    MICheckResult(::MI_DestinationOptions_GetUILocale(&this->m_destinationOptions, &locale));
+    MICheckResult(MI_DestinationOptions_GetUILocale(&this->m_destinationOptions, &locale));
     return locale;
 }
 
 void DestinationOptions::SetTimeout(const MI_Interval& timeout)
 {
-    MICheckResult(::MI_DestinationOptions_SetTimeout(&this->m_destinationOptions, &timeout));
+    MICheckResult(MI_DestinationOptions_SetTimeout(&this->m_destinationOptions, &timeout));
 }
 
 MI_Interval DestinationOptions::GetTimeout()
 {
     MI_Interval timeout;
-    MICheckResult(::MI_DestinationOptions_GetTimeout(&this->m_destinationOptions, &timeout));
+    MICheckResult(MI_DestinationOptions_GetTimeout(&this->m_destinationOptions, &timeout));
     return timeout;
 }
 
 void DestinationOptions::SetTransport(const std::wstring& transport)
 {
-    MICheckResult(::MI_DestinationOptions_SetTransport(&this->m_destinationOptions, transport.c_str()));
+    MICheckResult(MI_DestinationOptions_SetTransport(&this->m_destinationOptions, transport.c_str()));
 }
 
 std::wstring DestinationOptions::GetTransport()
 {
     const MI_Char* transport;
-    MICheckResult(::MI_DestinationOptions_GetTransport(&this->m_destinationOptions, &transport));
+    MICheckResult(MI_DestinationOptions_GetTransport(&this->m_destinationOptions, &transport));
     return transport;
 }
 
@@ -722,7 +722,7 @@ void DestinationOptions::AddCredentials(const std::wstring& authType,
     creds.authenticationType = authType.c_str();
     creds.credentials.certificateThumbprint = certThumbprint.c_str();
 
-    MICheckResult(::MI_DestinationOptions_AddDestinationCredentials(&this->m_destinationOptions, &creds));
+    MICheckResult(MI_DestinationOptions_AddDestinationCredentials(&this->m_destinationOptions, &creds));
 }
 
 void DestinationOptions::AddCredentials(const std::wstring& authType, const std::wstring& domain,
@@ -733,19 +733,19 @@ void DestinationOptions::AddCredentials(const std::wstring& authType, const std:
     creds.credentials.usernamePassword.username = username.c_str();
     creds.credentials.usernamePassword.password = password.c_str();
 
-    MICheckResult(::MI_DestinationOptions_AddDestinationCredentials(&this->m_destinationOptions, &creds));
+    MICheckResult(MI_DestinationOptions_AddDestinationCredentials(&this->m_destinationOptions, &creds));
 }
 
 std::shared_ptr<DestinationOptions> DestinationOptions::Clone() const
 {
     MI_DestinationOptions clonedDestinationOptions;
-    MICheckResult(::MI_DestinationOptions_Clone(&this->m_destinationOptions, &clonedDestinationOptions));
+    MICheckResult(MI_DestinationOptions_Clone(&this->m_destinationOptions, &clonedDestinationOptions));
     return std::shared_ptr<DestinationOptions>(new DestinationOptions(clonedDestinationOptions));
 }
 
 void DestinationOptions::Delete()
 {
-    ::MI_DestinationOptions_Delete(&this->m_destinationOptions);
+    MI_DestinationOptions_Delete(&this->m_destinationOptions);
     this->m_destinationOptions = MI_DESTINATIONOPTIONS_NULL;
 }
 
@@ -766,7 +766,7 @@ bool Session::IsClosed()
 
 void Session::Close()
 {
-    MICheckResult(::MI_Session_Close(&this->m_session, nullptr, nullptr));
+    MICheckResult(MI_Session_Close(&this->m_session, nullptr, nullptr));
     this->m_session = MI_SESSION_NULL;
 }
 
@@ -789,7 +789,7 @@ std::shared_ptr<Operation> Session::ExecQuery(const std::wstring& ns, const std:
                                               std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op = MI_OPERATION_NULL;
-    ::MI_Session_QueryInstances(
+    MI_Session_QueryInstances(
         &this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
         operationOptions ? &operationOptions->m_operationOptions : nullptr,
         ns.c_str(), dialect.c_str(),
@@ -802,7 +802,7 @@ std::shared_ptr<Operation> Session::GetAssociators(const std::wstring& ns, const
     std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op = MI_OPERATION_NULL;
-    ::MI_Session_AssociatorInstances(
+    MI_Session_AssociatorInstances(
         &this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
         operationOptions ? &operationOptions->m_operationOptions : nullptr,
         ns.c_str(), instance.m_instance,
@@ -819,7 +819,7 @@ std::shared_ptr<Operation> Session::InvokeMethod(
     std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op = MI_OPERATION_NULL;
-    ::MI_Session_Invoke(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_Invoke(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
         operationOptions ? &operationOptions->m_operationOptions : nullptr,
         instance.GetNameSpace().c_str(), instance.GetClassName().c_str(), methodName.c_str(), instance.m_instance,
         inboundParams && inboundParams->GetElementsCount() > 0 ? inboundParams->m_instance : nullptr,
@@ -832,7 +832,7 @@ std::shared_ptr<Operation> Session::InvokeMethod(
     std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op = MI_OPERATION_NULL;
-    ::MI_Session_Invoke(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_Invoke(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
         operationOptions ? &operationOptions->m_operationOptions : nullptr,
         ns.c_str(), className.c_str(), methodName.c_str(), nullptr,
         inboundParams && inboundParams->GetElementsCount() > 0 ? inboundParams->m_instance : nullptr,
@@ -844,7 +844,7 @@ void Session::DeleteInstance(const std::wstring& ns, const Instance& instance,
                              std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op;
-    ::MI_Session_DeleteInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_DeleteInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
 		                        operationOptions ? &operationOptions->m_operationOptions : nullptr,
                                 ns.c_str(), instance.m_instance, nullptr, &op);
     Operation operation(op);
@@ -858,7 +858,7 @@ void Session::ModifyInstance(const std::wstring& ns, const Instance& instance,
                              std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op;
-    ::MI_Session_ModifyInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_ModifyInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
                                 operationOptions ? &operationOptions->m_operationOptions : nullptr,
                                 ns.c_str(), instance.m_instance, nullptr, &op);
     Operation operation(op);
@@ -872,7 +872,7 @@ void Session::CreateInstance(const std::wstring& ns, const Instance& instance,
                              std::shared_ptr<OperationOptions> operationOptions)
 {
     MI_Operation op;
-    ::MI_Session_CreateInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_CreateInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
                                 operationOptions ? &operationOptions->m_operationOptions : nullptr,
                                 ns.c_str(), instance.m_instance, nullptr, &op);
     Operation operation(op);
@@ -885,7 +885,7 @@ void Session::CreateInstance(const std::wstring& ns, const Instance& instance,
 std::shared_ptr<Operation> Session::GetInstance(const std::wstring& ns, const Instance& keyInstance)
 {
     MI_Operation op;
-    ::MI_Session_GetInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI, nullptr, ns.c_str(), keyInstance.m_instance, nullptr, &op);
+    MI_Session_GetInstance(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI, nullptr, ns.c_str(), keyInstance.m_instance, nullptr, &op);
     return std::make_shared<Operation>(op);
 }
 
@@ -893,7 +893,7 @@ std::shared_ptr<Operation> Session::GetClass(const std::wstring& ns, const std::
 {
     MI_Class* miClass = nullptr;
     MI_Operation op;
-    ::MI_Session_GetClass(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI, nullptr, ns.c_str(), className.c_str(), nullptr, &op);
+    MI_Session_GetClass(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI, nullptr, ns.c_str(), className.c_str(), nullptr, &op);
     return std::make_shared<Operation>(op);
 }
 
@@ -903,7 +903,7 @@ std::shared_ptr<Operation> Session::Subscribe(const std::wstring& ns, const std:
     MI_OperationCallbacks opCallbacks = GetMIOperationCallbacks(callbacks);
     MI_Operation op;
     // TODO: Add MI_SubscriptionDeliveryOptions for WinRM case
-    ::MI_Session_Subscribe(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
+    MI_Session_Subscribe(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI,
         operationOptions ? &operationOptions->m_operationOptions : nullptr,
         ns.c_str(), dialect.c_str(), query.c_str(), nullptr, callbacks ? &opCallbacks : nullptr, &op);
     return std::make_shared<Operation>(op);
@@ -925,40 +925,40 @@ ScopedItem::~ScopedItem()
 MI_Type Instance::GetElementType(const std::wstring& name) const
 {
     MI_Type itemType;
-    MICheckResult(::MI_Instance_GetElement(this->m_instance, name.c_str(), nullptr, &itemType, nullptr, nullptr));
+    MICheckResult(MI_Instance_GetElement(this->m_instance, name.c_str(), nullptr, &itemType, nullptr, nullptr));
     return itemType;
 }
 
 MI_Type Instance::GetElementType(unsigned index) const
 {
     MI_Type itemType;
-    MICheckResult(::MI_Instance_GetElementAt(this->m_instance, index, nullptr, nullptr, &itemType, nullptr));
+    MICheckResult(MI_Instance_GetElementAt(this->m_instance, index, nullptr, nullptr, &itemType, nullptr));
     return itemType;
 }
 
 void Instance::SetElement(const std::wstring& name, const MIValue& value)
 {
-    MICheckResult(::MI_Instance_SetElement(this->m_instance, name.c_str(), &value.m_value, value.m_type, value.m_flags));
+    MICheckResult(MI_Instance_SetElement(this->m_instance, name.c_str(), &value.m_value, value.m_type, value.m_flags));
 }
 
 void Instance::SetElement(unsigned index, const MIValue& value)
 {
-    MICheckResult(::MI_Instance_SetElementAt(this->m_instance, index, &value.m_value, value.m_type, value.m_flags));
+    MICheckResult(MI_Instance_SetElementAt(this->m_instance, index, &value.m_value, value.m_type, value.m_flags));
 }
 
 void Instance::AddElement(const std::wstring& name, const MIValue& value)
 {
-    MICheckResult(::MI_Instance_AddElement(this->m_instance, name.c_str(), &value.m_value, value.m_type, value.m_flags));
+    MICheckResult(MI_Instance_AddElement(this->m_instance, name.c_str(), &value.m_value, value.m_type, value.m_flags));
 }
 
 void Instance::ClearElement(const std::wstring& name)
 {
-    MICheckResult(::MI_Instance_ClearElement(this->m_instance, name.c_str()));
+    MICheckResult(MI_Instance_ClearElement(this->m_instance, name.c_str()));
 }
 
 void Instance::ClearElement(unsigned index)
 {
-    MICheckResult(::MI_Instance_ClearElementAt(this->m_instance, index));
+    MICheckResult(MI_Instance_ClearElementAt(this->m_instance, index));
 }
 
 const std::vector<std::wstring>& Instance::GetKeyElementNames()
@@ -1050,7 +1050,7 @@ std::wstring Instance::GetPath()
 std::shared_ptr<ValueElement> Instance::operator[] (const std::wstring& name) const
 {
     auto element = std::make_shared<ValueElement>();
-    MICheckResult(::MI_Instance_GetElement(this->m_instance, name.c_str(), &element->m_value, &element->m_type,
+    MICheckResult(MI_Instance_GetElement(this->m_instance, name.c_str(), &element->m_value, &element->m_type,
         &element->m_flags, &element->m_index));
     element->m_name = name;
     return element;
@@ -1060,7 +1060,7 @@ std::shared_ptr<ValueElement> Instance::operator[] (unsigned index) const
 {
     auto element = std::make_shared<ValueElement>();
     const MI_Char* name;
-    MICheckResult(::MI_Instance_GetElementAt(this->m_instance, index, &name, &element->m_value,
+    MICheckResult(MI_Instance_GetElementAt(this->m_instance, index, &name, &element->m_value,
         &element->m_type, &element->m_flags));
     element->m_name = name;
     element->m_index = index;
@@ -1070,7 +1070,7 @@ std::shared_ptr<ValueElement> Instance::operator[] (unsigned index) const
 unsigned Instance::GetElementsCount() const
 {
     MI_Uint32 count = 0;
-    MICheckResult(::MI_Instance_GetElementCount(this->m_instance, &count));
+    MICheckResult(MI_Instance_GetElementCount(this->m_instance, &count));
     return count;
 }
 
@@ -1079,7 +1079,7 @@ std::shared_ptr<Instance> Instance::Clone() const
     if (this->m_instance)
     {
         MI_Instance* newInstance = nullptr;
-        MICheckResult(::MI_Instance_Clone(this->m_instance, &newInstance));
+        MICheckResult(MI_Instance_Clone(this->m_instance, &newInstance));
         return std::make_shared<Instance>(newInstance, true);
     }
 
@@ -1089,34 +1089,34 @@ std::shared_ptr<Instance> Instance::Clone() const
 std::shared_ptr<Class> Instance::GetClass() const
 {
     MI_Class* miClass = nullptr;
-    MICheckResult(::MI_Instance_GetClass(this->m_instance, &miClass));
+    MICheckResult(MI_Instance_GetClass(this->m_instance, &miClass));
     return std::make_shared<Class>(miClass, true);
 }
 
 std::wstring Instance::GetClassName() const
 {
     const MI_Char* className = nullptr;
-    MICheckResult(::MI_Instance_GetClassName(this->m_instance, &className));
+    MICheckResult(MI_Instance_GetClassName(this->m_instance, &className));
     return std::wstring(className);
 }
 
 std::wstring Instance::GetNameSpace() const
 {
     const MI_Char* ns = nullptr;
-    MICheckResult(::MI_Instance_GetNameSpace(this->m_instance, &ns));
+    MICheckResult(MI_Instance_GetNameSpace(this->m_instance, &ns));
     return std::wstring(ns ? ns : L"");
 }
 
 std::wstring Instance::GetServerName() const
 {
     const MI_Char* serverName = nullptr;
-    MICheckResult(::MI_Instance_GetServerName(this->m_instance, &serverName));
+    MICheckResult(MI_Instance_GetServerName(this->m_instance, &serverName));
     return std::wstring(serverName ? serverName : L"");
 }
 
 void Instance::Delete()
 {
-    MICheckResult(::MI_Instance_Delete(this->m_instance));
+    MICheckResult(MI_Instance_Delete(this->m_instance));
     this->m_instance = nullptr;
 }
 
@@ -1146,7 +1146,7 @@ Instance::~Instance()
 
 void Operation::Cancel()
 {
-    MICheckResult(::MI_Operation_Cancel(&this->m_operation, MI_REASON_NONE));
+    MICheckResult(MI_Operation_Cancel(&this->m_operation, MI_REASON_NONE));
 }
 
 void Operation::RemoveFromScopeContext(ScopedItem* item)
@@ -1175,7 +1175,7 @@ std::shared_ptr<Class> Operation::GetNextClass()
         const MI_Instance* compDetails = nullptr;
 
         const MI_Class* miClass = nullptr;
-        MICheckResult(::MI_Operation_GetClass(&this->m_operation, &miClass, &this->m_hasMoreResults, &miResult,
+        MICheckResult(MI_Operation_GetClass(&this->m_operation, &miClass, &this->m_hasMoreResults, &miResult,
             &errMsg, &compDetails));
         MICheckResult(miResult, compDetails);
 
@@ -1198,7 +1198,7 @@ std::shared_ptr<Instance> Operation::GetNextInstance()
         const MI_Char* errMsg = nullptr;
         const MI_Instance* compDetails = nullptr;
         const MI_Instance* miInstance = nullptr;
-        MICheckResult(::MI_Operation_GetInstance(&this->m_operation, &miInstance, &this->m_hasMoreResults, &miResult,
+        MICheckResult(MI_Operation_GetInstance(&this->m_operation, &miInstance, &this->m_hasMoreResults, &miResult,
             &errMsg, &compDetails));
         MICheckResult(miResult, compDetails);
 
@@ -1222,7 +1222,7 @@ std::shared_ptr<Instance> Operation::GetNextIndication()
         const MI_Instance* compDetails = nullptr;
         const MI_Instance* miInstance = nullptr;
         // TODO: Add bookmark and machineID support
-        MICheckResult(::MI_Operation_GetIndication(&this->m_operation, &miInstance, nullptr, nullptr, &this->m_hasMoreResults,
+        MICheckResult(MI_Operation_GetIndication(&this->m_operation, &miInstance, nullptr, nullptr, &this->m_hasMoreResults,
             &miResult, &errMsg, &compDetails));
         MICheckResult(miResult, compDetails);
 
@@ -1241,12 +1241,12 @@ std::wstring Serializer::SerializeInstance(const Instance& instance, bool includ
 {
     MI_Uint32 flags = includeClass ? MI_SERIALIZER_FLAGS_INSTANCE_WITH_CLASS : 0;
     MI_Uint32 bufferSizeNeeded = 0;
-    ::MI_Serializer_SerializeInstance(&m_serializer, flags, instance.m_instance, nullptr, 0, &bufferSizeNeeded);
+    MI_Serializer_SerializeInstance(&m_serializer, flags, instance.m_instance, nullptr, 0, &bufferSizeNeeded);
 
     MI_Uint8* buffer = new MI_Uint8[bufferSizeNeeded];
     try
     {
-        MICheckResult(::MI_Serializer_SerializeInstance(&m_serializer, flags, instance.m_instance, buffer,
+        MICheckResult(MI_Serializer_SerializeInstance(&m_serializer, flags, instance.m_instance, buffer,
             bufferSizeNeeded, &bufferSizeNeeded));
         auto data = std::wstring((wchar_t*)buffer, bufferSizeNeeded / sizeof(wchar_t));
         delete[] buffer;
@@ -1263,12 +1263,12 @@ std::wstring Serializer::SerializeClass(const Class& miClass, bool deep)
 {
     MI_Uint32 flags = deep ? MI_SERIALIZER_FLAGS_CLASS_DEEP : 0;
     MI_Uint32 bufferSizeNeeded = 0;
-    ::MI_Serializer_SerializeClass(&m_serializer, flags, miClass.m_class, nullptr, 0, &bufferSizeNeeded);
+    MI_Serializer_SerializeClass(&m_serializer, flags, miClass.m_class, nullptr, 0, &bufferSizeNeeded);
 
     MI_Uint8* buffer = new MI_Uint8[bufferSizeNeeded];
     try
     {
-        MICheckResult(::MI_Serializer_SerializeClass(&m_serializer, flags, miClass.m_class, buffer, bufferSizeNeeded, &bufferSizeNeeded));
+        MICheckResult(MI_Serializer_SerializeClass(&m_serializer, flags, miClass.m_class, buffer, bufferSizeNeeded, &bufferSizeNeeded));
         auto data = std::wstring((wchar_t*)buffer, bufferSizeNeeded / sizeof(wchar_t));
         delete[] buffer;
         return data;
@@ -1290,7 +1290,7 @@ bool Serializer::IsClosed()
 
 void Serializer::Close()
 {
-    MICheckResult(::MI_Serializer_Close(&m_serializer));
+    MICheckResult(MI_Serializer_Close(&m_serializer));
     ZeroMemory(&this->m_serializer, sizeof(MI_Serializer));
 }
 

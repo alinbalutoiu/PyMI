@@ -19,7 +19,7 @@ namespace MI
 
     public:
         Exception(const std::wstring& message) { SetMessageFromWString(message); };
-        const char* what() const;
+        const char* what();
     };
 
     class MIException : public Exception

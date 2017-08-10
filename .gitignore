@@ -233,3 +233,7 @@ _Pvt_Extensions
 *.pyd
 *.egg-info
 dist
+
+*.o
+*.a
+*.so

@@ -55,7 +55,7 @@ void MIValue::CopyString(const std::string& value)
 {
     int len = (int)(value.length() + 1);
     m_value.string = new MI_Char[len];
-    if (::MultiByteToWideChar(CP_ACP, 0, value.c_str(), len, m_value.string, len) != len)
+    if (MultiByteToWideChar(CP_ACP, 0, value.c_str(), len, m_value.string, len) != len)
     {
         delete[] m_value.string;
         throw Exception(L"MultiByteToWideChar failed");

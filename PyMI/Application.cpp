@@ -13,7 +13,7 @@ static PyObject* Application_new(PyTypeObject *type, PyObject *args, PyObject *k
 {
     Application* self = NULL;
     self = (Application*)type->tp_alloc(type, 0);
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -77,7 +77,7 @@ static void Application_dealloc(Application* self)
             self->app = NULL;
         });
     }
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

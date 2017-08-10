@@ -1,12 +1,12 @@
 #pragma once
 
 #include <Python.h>
-#include <mi.h>
+#include <MI.h>
 #include <MIExceptions.h>
 #include <string>
 #include <functional>
 #include <memory>
-#include "mi++.h"
+#include "MI++.h"
 
 PyObject* MI2Py(const MI_Value& value, MI_Type valueType, MI_Uint32 flags);
 std::shared_ptr<MI::MIValue> Py2MI(PyObject* pyValue, MI_Type valueType);

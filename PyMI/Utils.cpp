@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PyMI.h"
 #include "Utils.h"
-#include "instance.h"
+#include "Instance.h"
 #include <codecvt>
 
 #include <datetime.h>
@@ -20,14 +20,14 @@ void AllowThreads(PCRITICAL_SECTION cs, std::function<void()> action)
         _save = PyEval_SaveThread();
         if (cs)
         {
-            ::EnterCriticalSection(cs);
+            EnterCriticalSection(cs);
         }
 
         action();
 
         if (cs)
         {
-            ::LeaveCriticalSection(cs);
+            LeaveCriticalSection(cs);
         }
         // Py_END_ALLOW_THREADS
         PyEval_RestoreThread(_save);
@@ -36,7 +36,7 @@ void AllowThreads(PCRITICAL_SECTION cs, std::function<void()> action)
     {
         if (cs)
         {
-            ::LeaveCriticalSection(cs);
+            LeaveCriticalSection(cs);
         }
         if (_save)
         {
@@ -151,7 +151,7 @@ std::wstring Py2WString(PyObject* pyValue)
         throw MI::Exception(L"PyUnicode_AsWideChar failed");
     }
 
-    auto& value = std::wstring(w, len);
+    auto value = std::wstring(w, len);
     delete[] w;
     return value;
 }
@@ -167,9 +167,9 @@ std::shared_ptr<MI::MIValue> Py2StrMIValue(PyObject* pyValue)
     try
     {
 #ifdef IS_PY3K
-        auto& value = Py2WString(pyStrValue);
+        auto value = Py2WString(pyStrValue);
 #else
-        auto& value = std::string(PyString_AsString(pyStrValue));
+        auto value = std::string(PyString_AsString(pyStrValue));
 #endif
         Py_DECREF(pyStrValue);
         return MI::MIValue::FromString(value);
@@ -372,7 +372,7 @@ std::shared_ptr<MI::MIValue> Py2MI(PyObject* pyValue, MI_Type valueType)
                 pyObj = PyList_GetItem(pyValue, i);
             }
 
-            auto& tmpValue = Py2MI(pyObj, itemType);
+            auto tmpValue = Py2MI(pyObj, itemType);
             value->SetArrayItem(*tmpValue, (unsigned)i);
         }
         return value;

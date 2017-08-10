@@ -11,7 +11,7 @@ static PyObject* OperationOptions_new(PyTypeObject* type, PyObject* args, PyObje
     OperationOptions* self = NULL;
     self = (OperationOptions*)type->tp_alloc(type, 0);
     self->operationOptions = NULL;
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -26,7 +26,7 @@ static void OperationOptions_dealloc(OperationOptions* self)
     AllowThreads(&self->cs, [&]() {
         self->operationOptions = NULL;
     });
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

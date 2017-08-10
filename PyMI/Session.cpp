@@ -14,7 +14,7 @@ static PyObject* Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     Session* self = NULL;
     self = (Session*)type->tp_alloc(type, 0);
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     self->session = NULL;
     self->operationCallbacks = std::make_shared<std::vector<std::shared_ptr<MI::Callbacks>>>();
     return (PyObject *)self;
@@ -32,7 +32,7 @@ static void Session_dealloc(Session* self)
         self->session = NULL;
     });
     self->operationCallbacks = NULL;
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

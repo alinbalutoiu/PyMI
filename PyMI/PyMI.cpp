@@ -184,8 +184,8 @@ PyObject* _initmi(void)
                                                   wcslen(MI_DESTINATIONOPTIONS_TRANSPORT_HTTP)));
     // The misspelling of 'transport' is intentional, as this is how it's defined by MI.h.
     PyObject_SetAttrString(m, "MI_TRANSPORT_HTTPS",
-                           PyUnicode_FromWideChar(MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS,
-                                                  wcslen(MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS)));
+                           PyUnicode_FromStringAndSize(MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS,
+                                                       strlen(MI_DESTINATIONOPTIONS_TRANPSORT_HTTPS)));
 
     PyObject* mi_error = MiError_Init();
     if (mi_error == NULL)

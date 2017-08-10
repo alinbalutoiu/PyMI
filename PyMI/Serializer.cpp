@@ -10,7 +10,7 @@ static PyObject* Serializer_new(PyTypeObject* type, PyObject* args, PyObject* kw
 {
     Serializer* self = NULL;
     self = (Serializer*)type->tp_alloc(type, 0);
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -19,7 +19,7 @@ static void Serializer_dealloc(Serializer* self)
     AllowThreads(&self->cs, [&]() {
         self->serializer = NULL;
     });
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

@@ -11,7 +11,7 @@ static PyObject* Operation_new(PyTypeObject* type, PyObject* args, PyObject* kwd
     Operation* self = NULL;
     self = (Operation*)type->tp_alloc(type, 0);
     self->operation = NULL;
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -26,7 +26,7 @@ static void Operation_dealloc(Operation* self)
     AllowThreads(&self->cs, [&]() {
         self->operation = NULL;
     });
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

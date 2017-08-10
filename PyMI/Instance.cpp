@@ -10,7 +10,7 @@ static PyObject* Instance_new(PyTypeObject *type, PyObject *args, PyObject *kwds
     Instance* self = NULL;
     self = (Instance*)type->tp_alloc(type, 0);
     self->instance = NULL;
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -25,7 +25,7 @@ static void Instance_dealloc(Instance* self)
     AllowThreads(&self->cs, [&]() {
         self->instance = NULL;
     });
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -212,7 +212,7 @@ static PyObject* Instance_GetClassName(Instance *self, PyObject*)
 {
     try
     {
-        std::wstring& className = self->instance->GetClassName();
+        std::wstring className = self->instance->GetClassName();
         return PyUnicode_FromWideChar(className.c_str(), className.length());
     }
     catch (std::exception& ex)
@@ -226,7 +226,7 @@ static PyObject* Instance_GetNameSpace(Instance* self, PyObject*)
 {
     try
     {
-        std::wstring& nameSpace = self->instance->GetNameSpace();
+        std::wstring nameSpace = self->instance->GetNameSpace();
         return PyUnicode_FromWideChar(nameSpace.c_str(), nameSpace.length());
     }
     catch (std::exception& ex)
@@ -240,7 +240,7 @@ static PyObject* Instance_GetServerName(Instance* self, PyObject*)
 {
     try
     {
-        std::wstring& serverName = self->instance->GetServerName();
+        std::wstring serverName = self->instance->GetServerName();
         return PyUnicode_FromWideChar(serverName.c_str(), serverName.length());
     }
     catch (std::exception& ex)

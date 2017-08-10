@@ -12,7 +12,7 @@ static PyObject* DestinationOptions_new(PyTypeObject* type, PyObject* args, PyOb
     sizeof(DestinationOptions);
     self = (DestinationOptions*)type->tp_alloc(type, 0);
     self->destinationOptions = NULL;
-    ::InitializeCriticalSection(&self->cs);
+    InitializeCriticalSection(&self->cs);
     return (PyObject *)self;
 }
 
@@ -27,7 +27,7 @@ static void DestinationOptions_dealloc(DestinationOptions* self)
     AllowThreads(&self->cs, [&]() {
         self->destinationOptions = NULL;
     });
-    ::DeleteCriticalSection(&self->cs);
+    DeleteCriticalSection(&self->cs);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

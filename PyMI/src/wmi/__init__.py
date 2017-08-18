@@ -670,6 +670,7 @@ class _Connection(object):
 
     @avoid_blocking_call
     def _get_mi_class(self, class_name):
+        print "Getting class: %s" % class_name
         with self._session.get_class(
                 ns=self._ns, class_name=class_name) as op:
             cls = op.get_next_class()

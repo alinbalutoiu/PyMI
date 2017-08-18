@@ -630,9 +630,12 @@ std::shared_ptr<Session> Application::NewSession(const std::wstring& protocol, c
 {
     MI_Instance* extError = nullptr;
     MI_Session session;
+    MI_DestinationOptions miDestinationOptions = MI_DESTINATIONOPTIONS_NULL;
 
-    MICheckResult(MI_Application_NewSession(&this->m_app, protocol.length() ? protocol.c_str() : nullptr, computerName.c_str(),
-        destinationOptions ? &destinationOptions->m_destinationOptions : nullptr, nullptr, &extError, &session), extError);
+    int miResult = MI_Application_NewSession(&this->m_app, nullptr, computerName.c_str(),
+        destinationOptions ? &destinationOptions->m_destinationOptions : &miDestinationOptions, nullptr, &extError, &session);
+    printf("Error when doing MI_Application_NewSession: %d\n", miResult);
+    MICheckResult(miResult, extError);
     return std::shared_ptr<Session>(new Session(session));
 }
 
@@ -891,6 +894,7 @@ std::shared_ptr<Operation> Session::GetInstance(const std::wstring& ns, const In
 
 std::shared_ptr<Operation> Session::GetClass(const std::wstring& ns, const std::wstring& className)
 {
+    printf("Fetching class: %s", className);
     MI_Class* miClass = nullptr;
     MI_Operation op;
     MI_Session_GetClass(&this->m_session, MI_OPERATIONFLAGS_DEFAULT_RTTI, nullptr, ns.c_str(), className.c_str(), nullptr, &op);

@@ -12,6 +12,7 @@
 
 static PyObject* Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
+    printf("Session_new called\n");
     Session* self = NULL;
     self = (Session*)type->tp_alloc(type, 0);
     InitializeCriticalSection(&self->cs);
@@ -249,8 +250,10 @@ static PyObject* Session_DeleteInstance(Session *self, PyObject *args, PyObject 
 
 static PyObject* Session_GetClass(Session *self, PyObject *args, PyObject *kwds)
 {
+    printf("Getting class");
     wchar_t* ns = NULL;
     wchar_t* className = NULL;
+    printf("Getting class");
 
     static char *kwlist[] = { "ns", "class_name", NULL };
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "uu", kwlist, &ns, &className))
@@ -405,6 +408,7 @@ Session* Session_New(std::shared_ptr<MI::Session> session)
 {
     Session* obj = (Session*)Session_new(&SessionType, NULL, NULL);
     obj->session = session;
+    printf("Session modified\n");
     return obj;
 }
 
